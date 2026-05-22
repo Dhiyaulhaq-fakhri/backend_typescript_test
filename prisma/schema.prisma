@@ -10,15 +10,16 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  url = env("DATABASE_URL")
 }
 
 model Category{
   id          Int       @id @default(autoincrement())
   name        String
-  createdAt   DateTime  @default(now()) @map("Created_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  events      Event[]
 
-  @@map("Categories")
+  @@map("categories")
 }
 
 model Speaker{
@@ -26,19 +27,24 @@ model Speaker{
   name        String
   role        String
   image       String
-  createdAt   DateTime  @default(now()) @map("Created_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  events      Event[]
 
-  @@map("Speakers")
+  @@map("speakers")
 }
 
-model Event{
-  id          Int       @id @default(autoincrement())
+model Event {
+  id          Int      @id @default(autoincrement())
   name        String
-  categoryId  Int       @map("category_id")
+  categoryId  Int      @map("category_id") // Ini Foreign Key ke Category
   location    String
-  dateEvent   DateTime  @map("date_event")
-  description String
-  createdAt   DateTime  @default(now()) @map("Created_at")
+  dateEvent   DateTime @map("date_event")
+  description String   @db.Text            // Diubah ke @db.Text agar deskripsi tugasmu bisa panjang
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // 🌟 JEMBATAN RELASI RESMI (Wajib ditulis agar tidak error)
+  category    Category @relation(fields: [categoryId], references: [id])
+  speakers    Speaker[]
 
   @@map("events")
 }
